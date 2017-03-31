@@ -6,14 +6,14 @@ class MethodCallCheckTest < Minitest::Test
   end
 
   def test_method_registered
-    assert_equal true, MethodCallCheck::Store.instance.method_registered?(:method_to_test)
+    assert_equal true, MethodCallCheck::Store.instance.instance_method_registered?(:method_to_test)
   end
 
   def test_method_called
-    assert_nil MethodCallCheck::Store.instance.stored_method_call_stacks(:method_to_test)[0]
+    assert_nil MethodCallCheck::Store.instance.stored_instance_method_call_stacks(:method_to_test)[0]
     TestObject.new.method_to_test
-    refute_nil MethodCallCheck::Store.instance.stored_method_call_stacks(:method_to_test)[0]
-    assert_match 'method_call_check_test.rb', MethodCallCheck::Store.instance.stored_method_call_stacks(:method_to_test)[0]
+    refute_nil MethodCallCheck::Store.instance.stored_instance_method_call_stacks(:method_to_test)[0]
+    assert_match 'method_call_check_test.rb', MethodCallCheck::Store.instance.stored_instance_method_call_stacks(:method_to_test)[0]
   end
 
   def test_class_method_registered
@@ -28,7 +28,7 @@ class MethodCallCheckTest < Minitest::Test
   end
 
   class TestObject
-    
+
     extend MethodCallCheck::InstanceMethodCheck
     extend MethodCallCheck::ClassMethodCheck
 

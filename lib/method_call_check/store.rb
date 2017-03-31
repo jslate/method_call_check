@@ -11,36 +11,38 @@ module MethodCallCheck
       self.instance.client = redis_client
     end
 
-    def register_method(name)
-      @client.sadd('methodCalls:registered_methods', name)
+    def register_instance_method(name)
+      @client.sadd('method_call_check:instance_methods:registered', name)
     end
 
-    def method_registered?(name)
-      @client.sismember('methodCalls:registered_methods', name)
+    def instance_method_registered?(name)
+      @client.sismember('method_call_check:instance_methods:registered', name)
     end
 
-    def store_method_call(name, stack)
-      @client.zadd("methodCalls:calls:#{name}", Time.now.to_i, stack.to_json)
+    def store_instance_method_call(name, stack)
+      @client.zadd("method_call_check:instance_methods:calls:#{name}", Time.now.to_i, stack.to_json)
+      @client.incr("method_call_check:instance_methods:counts:#{name}")
     end
 
-    def stored_method_call_stacks(name)
-      @client.zrange("methodCalls:calls:#{name}", 0, -1)
+    def stored_instance_method_call_stacks(name)
+      @client.zrange("method_call_check:instance_methods:calls:#{name}", 0, -1)
     end
 
     def register_class_method(name)
-      @client.sadd('methodCalls:registered_class_methods', name)
+      @client.sadd('method_call_check:class_methods:registered', name)
     end
 
     def class_method_registered?(name)
-      @client.sismember('methodCalls:registered_class_methods', name)
+      @client.sismember('method_call_check:class_methods:registered', name)
     end
 
     def store_class_method_call(name, stack)
-      @client.zadd("methodCalls:class_method_calls:#{name}", Time.now.to_i, stack.to_json)
+      @client.zadd("method_call_check:class_methods:calls:#{name}", Time.now.to_i, stack.to_json)
+      @client.incr("method_call_check:class_methods:counts:#{name}")
     end
 
     def stored_class_method_call_stacks(name)
-      @client.zrange("methodCalls:class_method_calls:#{name}", 0, -1)
+      @client.zrange("method_call_check:class_methods:calls:#{name}", 0, -1)
     end
 
 
