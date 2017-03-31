@@ -1,8 +1,7 @@
 # MethodCallCheck
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/method_call_check`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+This gem lets you track method calls in your Ruby application. You might want to do this so you
+know if it is safe to delete a method you think isn't being called anywhere.
 
 ## Installation
 
@@ -22,7 +21,28 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Use `is_method_called?` and `is_class_method_called?` to register and record
+calls to instance and class methods.
+
+```ruby
+  class TestObject
+
+    extend MethodCallCheck::InstanceMethodCheck
+    extend MethodCallCheck::ClassMethodCheck
+
+    def method_to_test
+    end
+    is_method_called? :method_to_test
+
+    def self.class_method_to_test
+    end
+    is_class_method_called? :class_method_to_test
+
+  end
+```
+
+Right now, there's no interface to see if the methods have been called. So
+you might call this a work in progress!
 
 ## Development
 
@@ -32,5 +52,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/method_call_check. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
-
+Bug reports and pull requests are welcome on GitHub at https://github.com/jslate/method_call_check. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](contributor-covenant.org) code of conduct.
