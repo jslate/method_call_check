@@ -13,10 +13,15 @@ module MethodCallCheck
 
     def register_instance_method(name)
       @client.sadd('method_call_check:instance_methods:registered', name)
+      @client.set("method_call_check:instance_methods:registered_at:#{name}",  Time.now.to_i)
     end
 
     def instance_method_registered?(name)
       @client.sismember('method_call_check:instance_methods:registered', name)
+    end
+
+    def instance_method_registered_at(name)
+      @client.get("method_call_check:instance_methods:registered_at:#{name}").to_i
     end
 
     def store_instance_method_call(name, stack)
@@ -26,6 +31,10 @@ module MethodCallCheck
 
     def stored_instance_method_call_stacks(name)
       @client.zrange("method_call_check:instance_methods:calls:#{name}", 0, -1)
+    end
+
+    def stored_instance_method_call_count(name)
+      @client.get("method_call_check:instance_methods:counts:#{name}").to_i
     end
 
     def register_class_method(name)

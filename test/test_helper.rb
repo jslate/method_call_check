@@ -4,10 +4,20 @@ require 'minitest/autorun'
 require 'redis'
 
 def client
-  Redis.new(host: 'localhost', port: 6379)
+  @client ||= Redis.new(host: 'localhost', port: 6379)
 end
 
-client.zremrangebyrank("method_call_check:instance_methods:calls:method_to_test", 0, -1)
-client.zremrangebyrank("method_call_check:class_methods:calls:class_method_to_test", 0, -1)
+def reset_calls
+  client.del("method_call_check:instance_methods:counts:method_to_test")
+  client.del("method_call_check:instance_methods:calls:method_to_test")
+  client.del("method_call_check:class_methods:calls:class_method_to_test")
+end
+
+def reset_registrations
+  client.del("method_call_check:instance_methods:registered_at:method_to_test")
+end
+
+reset_calls
+reset_registrations
 
 MethodCallCheck::Store.client = client
