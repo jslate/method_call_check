@@ -1,11 +1,27 @@
 require 'singleton'
 require 'json'
+require 'active_support/core_ext/module/delegation'
 
 module MethodCallCheck
   class Store
     include Singleton
 
     attr_accessor :client
+
+    class << self
+      delegate(
+        :register_instance_method,
+        :instance_method_registered?,
+        :instance_method_registered_at,
+        :store_instance_method_call,
+        :stored_instance_method_call_stacks,
+        :stored_instance_method_call_count,
+        :register_class_method,
+        :class_method_registered?,
+        :store_class_method_call,
+        :stored_class_method_call_stacks,
+        to: :instance)
+    end
 
     def self.client=(redis_client)
       self.instance.client = redis_client
@@ -53,7 +69,6 @@ module MethodCallCheck
     def stored_class_method_call_stacks(name)
       @client.zrange("method_call_check:class_methods:calls:#{name}", 0, -1)
     end
-
 
   end
 end
