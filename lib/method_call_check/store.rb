@@ -6,10 +6,15 @@ module MethodCallCheck
   class Store
     include Singleton
 
-    attr_accessor :client
+    attr_reader :client
+
+    def initialize
+      @client = Redis.new(host: MethodCallCheck.configuration.redis_host, port: MethodCallCheck.configuration.redis_port)
+    end
 
     class << self
       delegate(
+        :client,
         :register_instance_method,
         :instance_method_registered?,
         :instance_method_registered_at,
@@ -23,10 +28,6 @@ module MethodCallCheck
         :stored_class_method_call_stacks,
         :stored_class_method_call_count,
         to: :instance)
-    end
-
-    def self.client=(redis_client)
-      self.instance.client = redis_client
     end
 
     def register_instance_method(name)

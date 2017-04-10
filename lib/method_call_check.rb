@@ -8,4 +8,20 @@ module MethodCallCheck
   extend ClassMethodCheck
   extend InstanceMethodCheck
 
+  class Configuration
+    attr_accessor :redis_host, :redis_port
+    def initialize
+      @redis_host = 'localhost'
+      @redis_port = 6379
+    end
+  end
+
+  def self.configuration
+    @configuration ||= Configuration.new
+  end
+
+  def self.configure
+    yield(configuration)
+  end
+
 end

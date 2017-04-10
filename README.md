@@ -41,6 +41,15 @@ calls to instance and class methods.
   end
 ```
 
+By default, this gem will expect to find a redis instance running on localhost port 6379. You can configure it to use a different host and port like this:
+
+```ruby
+  MethodCallCheck.configure do |config|
+    config.redis_port = 6379
+    config.redis_host = 'localhost'
+  end
+```
+
 Right now, there's no interface to see if the methods have been called. So
 you might call this a work in progress!
 

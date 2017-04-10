@@ -11,6 +11,7 @@ class MethodCallCheckTest < Minitest::Test
   end
 
   def test_method_called
+    reset_calls
     assert_nil MethodCallCheck::Store.stored_instance_method_call_stacks(:method_to_test)[0]
     TestObject.new.method_to_test
     refute_nil MethodCallCheck::Store.stored_instance_method_call_stacks(:method_to_test)[0]
