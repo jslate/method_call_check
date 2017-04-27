@@ -45,6 +45,7 @@ module MethodCallCheck
 
     def store_instance_method_call(name, stack)
       @client.zadd("method_call_check:instance_methods:calls:#{name}", Time.now.to_i, stack.to_json)
+      @client.zremrangebyrank("method_call_check:instance_methods:calls:#{name}", 10, -1)
       @client.incr("method_call_check:instance_methods:counts:#{name}")
     end
 
@@ -71,6 +72,7 @@ module MethodCallCheck
 
     def store_class_method_call(name, stack)
       @client.zadd("method_call_check:class_methods:calls:#{name}", Time.now.to_i, stack.to_json)
+      @client.zremrangebyrank("method_call_check:class_methods:calls:#{name}", 10, -1)
       @client.incr("method_call_check:class_methods:counts:#{name}")
     end
 
