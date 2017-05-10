@@ -15,7 +15,7 @@ class MethodCallCheckTest < Minitest::Test
     assert_nil MethodCallCheck::Store.stored_instance_method_call_stacks(:method_to_test)[0]
     TestObject.new.method_to_test
     refute_nil MethodCallCheck::Store.stored_instance_method_call_stacks(:method_to_test)[0]
-    assert_match 'method_call_check_test.rb', MethodCallCheck::Store.stored_instance_method_call_stacks(:method_to_test)[0]
+    assert_match 'method_call_check_test.rb', MethodCallCheck::Store.stored_instance_method_call_stacks(:method_to_test)[0].stack[0]
     assert_equal 1, MethodCallCheck::Store.stored_instance_method_call_count(:method_to_test)
   end
 

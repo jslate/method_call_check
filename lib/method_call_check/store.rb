@@ -1,5 +1,6 @@
 require 'singleton'
 require 'json'
+require 'redis'
 require 'active_support/core_ext/module/delegation'
 
 module MethodCallCheck
@@ -16,6 +17,7 @@ module MethodCallCheck
       delegate(
         :client,
         :register_instance_method,
+        :registered_instance_methods,
         :instance_method_registered?,
         :instance_method_registered_at,
         :store_instance_method_call,
@@ -35,6 +37,10 @@ module MethodCallCheck
       @client.set("method_call_check:instance_methods:registered_at:#{name}",  Time.now.to_i)
     end
 
+    def registered_instance_methods
+      @client.smembers('method_call_check:instance_methods:registered')
+    end
+
     def instance_method_registered?(name)
       @client.sismember('method_call_check:instance_methods:registered', name)
     end
@@ -45,12 +51,14 @@ module MethodCallCheck
 
     def store_instance_method_call(name, stack)
       @client.zadd("method_call_check:instance_methods:calls:#{name}", Time.now.to_i, stack.to_json)
-      @client.zremrangebyrank("method_call_check:instance_methods:calls:#{name}", 10, -1)
+      @client.zremrangebyrank("method_call_check:instance_methods:calls:#{name}", 0, -11)
       @client.incr("method_call_check:instance_methods:counts:#{name}")
     end
 
     def stored_instance_method_call_stacks(name)
-      @client.zrange("method_call_check:instance_methods:calls:#{name}", 0, -1)
+      @client.zrange("method_call_check:instance_methods:calls:#{name}", 0, -1).map do |stack|
+        MethodCall.new(@client.zscore("method_call_check:instance_methods:calls:#{name}", stack), stack)
+      end
     end
 
     def stored_instance_method_call_count(name)
@@ -72,7 +80,7 @@ module MethodCallCheck
 
     def store_class_method_call(name, stack)
       @client.zadd("method_call_check:class_methods:calls:#{name}", Time.now.to_i, stack.to_json)
-      @client.zremrangebyrank("method_call_check:class_methods:calls:#{name}", 10, -1)
+      @client.zremrangebyrank("method_call_check:class_methods:calls:#{name}", 0, -11)
       @client.incr("method_call_check:class_methods:counts:#{name}")
     end
 
