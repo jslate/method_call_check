@@ -3,6 +3,7 @@ require 'method_call_check/store'
 module MethodCallCheck::InstanceMethodCheck
 
   def is_method_called?(method_name)
+    return unless MethodCallCheck.configuration.enabled?
     MethodCallCheck::Store.register_instance_method(method_name)
 
     alias_method "orig_#{method_name}".to_sym, method_name
