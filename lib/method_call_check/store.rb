@@ -24,6 +24,7 @@ module MethodCallCheck
         :stored_instance_method_call_stacks,
         :stored_instance_method_call_count,
         :register_class_method,
+        :registered_class_methods,
         :class_method_registered?,
         :class_method_registered_at,
         :store_class_method_call,
@@ -68,6 +69,10 @@ module MethodCallCheck
     def register_class_method(name)
       @client.sadd('method_call_check:class_methods:registered', name)
       @client.set("method_call_check:class_methods:registered_at:#{name}",  Time.now.to_i)
+    end
+
+    def registered_class_methods
+      @client.smembers('method_call_check:class_methods:registered')
     end
 
     def class_method_registered?(name)
