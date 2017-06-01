@@ -8,7 +8,8 @@ module MethodCallCheck::InstanceMethodCheck
 
     alias_method "orig_#{method_name}".to_sym, method_name
     define_method(method_name) do |*args|
-      MethodCallCheck::Store.store_instance_method_call("#{self.class.name}::#{method_name}", caller)
+      klass_name = self.class.ancestors.detect{|cls| cls.public_instance_methods(false).include?(method_name)}
+      MethodCallCheck::Store.store_instance_method_call("#{klass_name}::#{method_name}", caller)
       send("orig_#{method_name}".to_sym, *args)
     end
   end
