@@ -6,7 +6,11 @@ module MethodCallCheck::ClassMethodCheck
     singleton_class.send(:alias_method, "orig_#{method_name}".to_sym, method_name)
     define_singleton_method(method_name) do |*args|
       MethodCallCheck::Store.store_class_method_call("#{self.name}::#{method_name}", caller)
-      self.send("orig_#{method_name}".to_sym, *args)
+      if MethodCallCheck.configuration.fail_on_call?
+        raise MethodCallCheck::MethodCallError
+      else
+        self.send("orig_#{method_name}".to_sym, *args)
+      end
     end
   end
 
